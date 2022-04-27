@@ -118,19 +118,38 @@ blogRouter.get(
 );
 
 // ==============================================
-blogRouter.put("/:blogId/customerComment/commentId", async (req, res, next) => {
-  try {
-  } catch (error) {
-    console.log(error);
-    next(error);
+blogRouter.put(
+  "/:blogId/customerComment/:commentId",
+  async (req, res, next) => {
+    try {
+      const blog = await blogsmodel.findById(req.params.blogId);
+      const index = blog.customerComment.findIndex(
+        (comment) => comment._id.toString() === req.params.commentId
+      );
+      blog.customerComment[index] = {
+        ...blog.customerComment[index].toObject(),
+        ...req.body,
+      };
+      await blog.save();
+      res.send(blog);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
   }
-});
+);
 
 // ==============================================
 blogRouter.delete(
-  "/:blogId/customerComment/commentId",
+  "/:blogId/customerComment/:commentId",
   async (req, res, next) => {
     try {
+      const modifie = await blogsmodel.findByIdAndUpdate(
+        req.params.blogId,
+        { $pull: { customerComment: { _id: req.params.commentId } } },
+        { new: true }
+      );
+      res.send(modifie);
     } catch (error) {
       console.log(error);
       next(error);

@@ -8,6 +8,9 @@ const userSchema = new Schema(
     lastname: { type: String },
     age: { type: Number, min: 18, max: 65 },
     email: { type: String },
+    buyProduct: [
+      { name: String, category: String, price: Number, purchaseDate: Date },
+    ],
   },
   { Timestamps: true }
 );
