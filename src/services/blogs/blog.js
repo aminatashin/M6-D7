@@ -1,5 +1,8 @@
 import express from "express";
+import createError from "http-errors";
 import blogsmodel from "../../../model/blogsmodel.js";
+import commentsmodel from "../../../model/commentsmodel.js";
+import usersmodel from "../../../model/usersmodel.js";
 
 // ==============================================
 const blogRouter = express.Router();
@@ -63,6 +66,77 @@ blogRouter.delete("/:blogId", async (req, res, next) => {
     next(error);
   }
 });
+// =========================embedding=========================
+blogRouter.post("/:blogId/customerComment", async (req, res, next) => {
+  try {
+    const comment = await commentsmodel.findById(req.body.commentId, {
+      _id: 0,
+    });
+    const commentConvert = { ...comment.toObject(), commentDate: new Date() };
+    const modifiedBlog = await blogsmodel.findByIdAndUpdate(
+      req.params.blogId,
+      { $push: { customerComment: commentConvert } },
+      { new: true, runValidators: true }
+    );
+    res.send(modifiedBlog);
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
+
+// ==============================================
+blogRouter.get("/:blogId/customerComment", async (req, res, next) => {
+  try {
+    const blog = await blogsmodel.findById(req.params.blogId);
+    res.send(blog.customerComment);
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
+
+// ==============================================
+blogRouter.get(
+  "/:blogId/customerComment/:commentId",
+  async (req, res, next) => {
+    try {
+      const blog = await blogsmodel.findById(req.params.blogId);
+      if (blog) {
+        const comments = blog.customerComment.find(
+          (comment) => comment._id.toString() === req.params.commentId
+        );
+        res.send(comments);
+      } else {
+        next(createError(404));
+      }
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
+);
+
+// ==============================================
+blogRouter.put("/:blogId/customerComment/commentId", async (req, res, next) => {
+  try {
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
+
+// ==============================================
+blogRouter.delete(
+  "/:blogId/customerComment/commentId",
+  async (req, res, next) => {
+    try {
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
+);
 
 // ==============================================
 

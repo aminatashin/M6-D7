@@ -1,3 +1,4 @@
+import { text } from "express";
 import mongoose from "mongoose";
 
 // =======================================
@@ -16,6 +17,7 @@ const blogSchema = new Schema(
       avatar: { type: String },
     },
     content: { type: String },
+    customerComment: [{ text: String, commentDate: Date }],
   },
   { timestamps: true }
 );
