@@ -2,7 +2,7 @@ import express from "express";
 import createError from "http-errors";
 import blogsmodel from "../../../model/blogsmodel.js";
 import commentsmodel from "../../../model/commentsmodel.js";
-import usersmodel from "../../../model/usersmodel.js";
+import q2m from "query-to-mongo";
 
 // ==============================================
 const blogRouter = express.Router();
@@ -22,7 +22,13 @@ blogRouter.post("/", async (req, res, next) => {
 // ==============================================
 blogRouter.get("/", async (req, res, next) => {
   try {
-    const getBlogs = await blogsmodel.find();
+    const { mongoquery } = q2m(req.query);
+    const getBlogs = await blogsmodel
+      .find(mongoquery.criteria)
+      .sort(mongoquery.option.sort)
+      .skip(mongoquery.option.skip)
+      .limit(mongoquery.option.limit)
+      .populate({ path: "authorRef", select: "name , avatar" });
     res.send(getBlogs);
   } catch (error) {
     console.log(error);

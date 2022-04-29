@@ -1,4 +1,3 @@
-import { text } from "express";
 import mongoose from "mongoose";
 
 // =======================================
@@ -12,10 +11,8 @@ const blogSchema = new Schema(
       value: { type: Number },
       unit: { type: Number },
     },
-    author: {
-      name: { type: String },
-      avatar: { type: String },
-    },
+    authorRef: [{ type: Schema.Types.ObjectId, ref: "Author" }],
+
     content: { type: String },
     customerComment: [{ text: String, commentDate: Date }],
   },
